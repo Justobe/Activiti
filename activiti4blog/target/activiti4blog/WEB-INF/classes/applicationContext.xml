@@ -1,0 +1,134 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                         http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                        http://www.springframework.org/schema/mvc
+                        http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--启用spring的一些annotation -->
+    <context:annotation-config/>
+
+    <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制\器 -->
+    <context:component-scan base-package="com.blog.yanming.controller">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <mvc:annotation-driven/>
+    <!-- 使用thymeleaf解析 -->
+    <bean id="templateResolver"
+          class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/view/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML" />
+        <property name="cacheable" value="false" />
+    </bean>
+
+    <bean id="templateEngine"
+          class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+    </bean>
+
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- dataSourse连接池相关属性，代码不在此贴出，会放在打包好的项目里面 -->
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+    <context:component-scan base-package="com.blog.yanming.service" >
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+    <context:component-scan base-package="com.blog.yanming.repository" >
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    <!-- 支持注解方式声明式事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+    <!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
+    <jpa:repositories base-package="com.blog.yanming.repository" repository-impl-postfix="Impl" entity-manager-factory-ref="entityManagerFactory" transaction-manager-ref="transactionManager" />
+
+    <!-- 实体管理器 -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan" value="com.blog.yanming.entity" />
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.ejb.HibernatePersistence" />
+        </property>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="generateDdl" value="false" />
+                <property name="database" value="MYSQL" />
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect" />
+                <!-- <property name="showSql" value="true" /> -->
+            </bean>
+        </property>
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+        </property>
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="hibernate.query.substitutions" value="true 1, false 0" />
+                <entry key="hibernate.default_batch_fetch_size" value="16" />
+                <entry key="hibernate.max_fetch_depth" value="2" />
+                <entry key="hibernate.generate_statistics" value="true" />
+                <entry key="hibernate.bytecode.use_reflection_optimizer" value="true" />
+                <entry key="hibernate.cache.use_second_level_cache" value="false" />
+                <entry key="hibernate.cache.use_query_cache" value="false" />
+                <entry key="hibernate.hbm2ddl.auto" value="update"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+
+        <property name="validationQuery" value="SELECT 'x' from dual" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+    </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--spring session -->
+    <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"/>
+    <bean class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="127.0.0.1"/>
+        <property name="port" value="6379"/>
+        <property name="database" value="0"/>
+    </bean>
+    <!--- *************************************************  -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 传播行为 -->
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 切面 -->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice"
+                     pointcut="execution(* com.blog.yanming.service.impl.*.*(..))"/>
+    </aop:config>
+</beans>

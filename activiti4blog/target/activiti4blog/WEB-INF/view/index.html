@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico"/>
+    <link rel="bookmark" href="/static/images/favicon.ico"/>
+    <title th:text="${session.user.username} + ' | 管理'"></title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/sweetalert.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/semantic.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top"
+     style="background-color: #f6f6f6; border: none;box-shadow: 0px 2px 8px 0px rgba(50,50,50,0.25);" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="">
+                <img alt="网站Logo" src="/static/images/logo.png" style="margin-top: -10px; width: 35px"/>
+            </a>
+            <a class="navbar-brand" href="/">
+                系统管理
+            </a>
+        </div>
+
+
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/"><span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;当前任务</a></li>
+            <li><a href="/modelPage"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;&nbsp;模型管理</a></li>
+            <li><a href="/processPage"><span class="glyphicon glyphicon-briefcase"></span>&nbsp;&nbsp;流程管理</a></li>
+        </ul>
+
+
+        <div class="ui inline dropdown navbar-right" style="line-height: 50px">
+            <div class="text">
+                <img class="ui avatar image" src="/static/images/avatar/default.png"/>
+                <span id="username" th:text="${session.user.username}"></span>
+            </div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item" style="color: black" id="logout"><a href="/logout"><span
+                        class="glyphicon glyphicon-log-out"></span> &nbsp;退出登录</a></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid" style="margin-top: 70px">
+    <div class="row" style="">
+        <div class="col-xs-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active" data-toggle="tab" href="#my_task"><a href="">我的待办 </a></li>
+                <li><a data-toggle="tab" href="#history_record">历史记录 </a></li>
+            </ul>
+        </div>
+
+        <div class="col-xs-10 tab-content">
+            <div class="tab-pane fade active in" id="my_task">
+                <div class="panel panel-default">
+                    <!--<div class="panel-heading"><h3>我的待办</h3></div>-->
+                    <div class="panel-body">
+                        <ol class="breadcrumb">
+                            <li><a href="/">当前任务</a></li>
+                            <li class="active">我的待办</li>
+                        </ol>
+                        <div id="myAssignment">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr class="info">
+                                    <th style="text-align: center">任务ID</th>
+                                    <th style="text-align: center">任务名称</th>
+                                    <th style="text-align: center">开始时间</th>
+                                    <th style="text-align: center">申请人</th>
+                                    <th style="text-align: center">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="ma_tbid" style="text-align: center">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="cmntDiv">
+                            <div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">任务办理</h4>
+                                        </div>
+                                        <div class="modal-body" id="modal-body">
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                                            <button type="button" class="btn btn-success" data-dismiss="modal" onclick="completeTask()">确认办理</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/><br/>
+
+
+                        <div class="modal fade" id="processImageModal" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel">
+                            <div style="width: 1000px; height: 600px" class="modal-dialog model-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="myProcessImageModalLabel"> &nbsp; > &nbsp; 当前进度</h4>
+                                    </div>
+                                    <div class="modal-body" id="process-image-modal-body">
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关 闭</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="actiDiv" style="display: none;">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr class="info">
+                                    <th style="text-align: center">Id</th>
+                                    <th style="text-align: center">活动Id</th>
+                                    <th style="text-align: center">活动名称</th>
+                                    <th style="text-align: center">活动类型</th>
+                                    <th style="text-align: center">开始时间</th>
+                                    <th style="text-align: center">结束时间</th>
+                                    <th style="text-align: center">处理人</th>
+                                    <th style="text-align: center">查看详情</th>
+                                </tr>
+                                </thead>
+                                <tbody id="ac_tbid">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="history_record" style="padding-left: 10px;">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ol class="breadcrumb">
+                            <li><a href="/">当前任务</a></li>
+                            <li class="active">历史记录</li>
+                        </ol>
+                        <div id="HisDiv">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr class="info">
+                                    <th style="text-align: center">流程ID</th>
+                                    <th style="text-align: center">流程名称</th>
+                                    <th style="text-align: center">开始时间</th>
+                                    <th style="text-align: center">流程状态</th>
+                                    <th style="text-align: center">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="his_tbid" style="text-align: center">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="hisDtlModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="task-detail-modal">办理细节</h4>
+                        </div>
+                        <div id="hisDtlDiv" class="modal-body">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr style="text-align: center">
+                                    <th style="text-align: center">表单字段名</th>
+                                    <th style="text-align: center">表单属性值</th>
+                                </tr>
+                                </thead>
+                                <tbody id="hisdtl_tbid">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">关 闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="historyProcessImageModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div style="width: 1000px; height: 600px" class="modal-dialog model-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="historyProcessImageModalLabel">历史记录 &nbsp; > &nbsp; 当前进度</h4>
+                        </div>
+                        <div class="modal-body" id="history-process-image-modal-body">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关 闭</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</body>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/sweetalert.min.js"></script>
+<script src="/static/js/semantic.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script src="/static/js/indxCtrl.js"></script>
+</html>
