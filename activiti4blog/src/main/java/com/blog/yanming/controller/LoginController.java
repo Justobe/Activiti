@@ -9,6 +9,7 @@ import com.blog.yanming.service.UserService;
 import com.blog.yanming.utils.SpringSessionUtil;
 import com.sun.org.apache.bcel.internal.generic.AALOAD;
 
+import org.activiti.engine.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,9 +36,9 @@ public class LoginController {
     private UserService userService;
 
 
-    /*@Autowired
+    @Autowired
     private IdentityService identityService;
-    */
+
     @RequestMapping(value = {"/login","/"}, method = RequestMethod.GET)
     public String login(HttpSession session) {
         User tmpUser = SpringSessionUtil.getSession(session);
@@ -59,7 +60,7 @@ public class LoginController {
     }
 
 
-    /*@RequestMapping(value = "/register", method = RequestMethod.POST)
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public String registerPost(@RequestParam("username") String username,
                                @RequestParam("password") String password,
@@ -81,7 +82,7 @@ public class LoginController {
 
         return "user_has_existed";
     }
-*/
+
 
     /**
      * @Date: 13:22 2017/6/6

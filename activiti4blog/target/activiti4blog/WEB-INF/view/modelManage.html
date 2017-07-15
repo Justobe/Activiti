@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico"/>
+    <link rel="bookmark" href="/static/images/favicon.ico"/>
+    <title th:text="${session.user.username} + ' | 管理'"></title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/sweetalert.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/semantic.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top"
+     style="background-color: #f6f6f6; border: none;box-shadow: 0px 2px 8px 0px rgba(50,50,50,0.25);" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="">
+                <img alt="网站Logo" src="/static/images/logo.png" style="margin-top: -10px; width: 35px"/>
+            </a>
+            <a class="navbar-brand" href="/">
+                系统管理
+            </a>
+        </div>
+
+        <ul class="nav navbar-nav">
+            <li><a href="/loginOK"><span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;当前任务</a></li>
+            <li class="active"><a href="/"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;&nbsp;模型管理</a></li>
+            <li><a href="/processPage"><span class="glyphicon glyphicon-briefcase"></span>&nbsp;&nbsp;流程管理</a></li>
+        </ul>
+
+        <div class="ui inline dropdown navbar-right" style="line-height: 50px">
+            <div class="text">
+                <img class="ui avatar image" src="/static/images/avatar/default.png"/>
+                <span id="username" th:text="${session.user.username}"></span>
+            </div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item" style="color: black" id="logout"><a href="/logout"><span
+                        class="glyphicon glyphicon-log-out"></span> &nbsp;退出登录</a></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid" style="margin-top: 70px">
+    <div class="row" style="">
+        <div class="col-xs-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a data-toggle="tab" href="#operate_model">操作模型</a></li>
+                <li data-toggle="tab" href="#create_model"><a href="">创建模型</a></li>
+            </ul>
+        </div>
+
+        <div class="col-xs-10 tab-content">
+            <div class="tab-pane fade active in" id="operate_model" style="padding-left: 10px;">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ol class="breadcrumb">
+                            <li><a href="/modelPage">模型管理</a></li>
+                            <li class="active">操作模型</li>
+                        </ol>
+                        <div id="addPanel">
+
+                        </div>
+                        <div id="container">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr class="info">
+                                    <th style="text-align: center">ID</th>
+                                    <th style="text-align: center">KEY</th>
+                                    <th style="text-align: center">名称</th>
+                                    <th style="text-align: center">版本</th>
+                                    <th style="text-align: center">创建时间</th>
+                                    <th style="text-align: center">最后更新时间</th>
+                                    <th style="text-align: center">元数据</th>
+                                    <th style="text-align: center">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="m_tbid" style="text-align: center">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="create_model">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ol class="breadcrumb">
+                            <li><a href="/modelPage">模型管理</a></li>
+                            <li class="active">创建模型</li>
+                        </ol>
+                        <tbody style="text-align: center">
+                        <div id="container">
+                            <div class="row">
+                                <div class="col-md-8 col-md-offset-2">
+                                    <tr>
+                                        <td><label for="name" class="control-label">Name</label></td>
+                                        <td><input type="text" id="name" class="form-control"/></td>
+                                    </tr>
+                                    <br/>
+                                    <tr>
+                                        <td><label for="key" class="control-label">Key</label></td>
+                                        <td><input type="text" id="key" class="form-control"/></td>
+                                    </tr>
+                                    <br/>
+                                    <tr>
+                                        <td><label for="description" class="control-label">Description</label></td>
+                                        <td><input type="text" id="description" name="class" class="form-control"/></td>
+                                    </tr>
+                                    <br/>
+                                    <tr>
+                                        <button class="btn btn-success form-control" onclick="addModel()">创建模型</button>
+                                    </tr>
+                                </div>
+                            </div>
+
+                        </div>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+<div class="btn-group">
+    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">操&nbsp;&nbsp;作&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+        <li onclick="getProgress(this)"><a href="javascript:void(0)">查看进度</a></li>
+        <li onclick="getDetail(this)"><a href="javascript:void(0)">办理细节</a></li>
+        <li onclick="clickComplete(this)"><a href="javascript:void(0)">办&nbsp;&nbsp;&nbsp;&nbsp;理</a></li>
+    </ul>
+</div>
+-->
+
+</body>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/sweetalert.min.js"></script>
+<script src="/static/js/semantic.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script src="/static/js/mdlPageCtrl.js"></script>
+</html>

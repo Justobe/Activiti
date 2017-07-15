@@ -12,6 +12,8 @@
     <param-name>webAppRootKey</param-name>
     <param-value>web.root</param-value>
   </context-param>
+
+
   <!--配置springmvc DispatcherServlet-->
   <servlet>
     <servlet-name>springMVC</servlet-name>
@@ -20,7 +22,8 @@
       <!--Sources标注的文件夹下需要新建一个spring文件夹-->
       <param-name>contextConfigLocation</param-name>
       <param-value>
-        classpath*:/applicationContext.xml
+        classpath*:/applicationContext.xml,
+        classpath*:/spring-activiti.xml
       </param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
