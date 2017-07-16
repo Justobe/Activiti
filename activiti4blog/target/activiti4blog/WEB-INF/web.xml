@@ -12,6 +12,9 @@
     <param-name>webAppRootKey</param-name>
     <param-value>web.root</param-value>
   </context-param>
+  <listener>
+    <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+  </listener>
 
 
   <!--配置springmvc DispatcherServlet-->
